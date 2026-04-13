@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<body>
+<h2>Add Movie</h2>
+<button onclick="addMovie()">Add Interstellar</button>
+<button onclick="getMovies()">Get All Movies</button>
+<pre id="result"></pre>
+
+<script>
+async function addMovie() {
+  const response = await fetch('http://localhost:8080/movies', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      title: "Interstellar",
+      genre: "Sci-Fi",
+      year: 2014
+    })
+  });
+  const data = await response.json();
+  document.getElementById('result').textContent = JSON.stringify(data, null, 2);
+}
+
+async function getMovies() {
+  const response = await fetch('http://localhost:8080/movies');
+  const data = await response.json();
+  document.getElementById('result').textContent = JSON.stringify(data, null, 2);
+}
+</script>
+</body>
+</html>
