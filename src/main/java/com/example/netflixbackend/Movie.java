@@ -10,8 +10,9 @@ public class Movie {
     private String title;
     private String genre;
     private int year;
+    private String posterUrl; // --- NEW FIELD FOR IMAGES ---
 
-    // These "Getters" allow the browser to see the data
+    // Getters and Setters
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 
@@ -23,4 +24,8 @@ public class Movie {
 
     public int getYear() { return year; }
     public void setYear(int year) { this.year = year; }
+
+    // --- NEW GETTER AND SETTER FOR POSTER ---
+    public String getPosterUrl() { return posterUrl; }
+    public void setPosterUrl(String posterUrl) { this.posterUrl = posterUrl; }
 }

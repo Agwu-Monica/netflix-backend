@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Netflix Clone</title>
+    <style>
+        body { background-color: #141414; color: white; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; margin: 0; }
+        .nav { padding: 20px 5%; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(to bottom, rgba(0,0,0,0.7) 10%, rgba(0,0,0,0)); }
+        .logo { color: #E50914; font-size: 40px; font-weight: bold; letter-spacing: -2px; }
+        
+        .controls { padding: 20px 5%; background: #222; display: flex; gap: 10px; flex-wrap: wrap; }
+        input { padding: 10px; border-radius: 4px; border: none; }
+        button { padding: 10px 20px; background-color: #E50914; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        button:hover { background-color: #f40612; }
+
+        .movie-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; padding: 40px 5%; }
+        .movie-card { background: #181818; border-radius: 4px; overflow: hidden; transition: transform 0.3s; border: 1px solid #333; padding: 10px; display: flex; flex-direction: column; }
+        .movie-card:hover { transform: scale(1.05); z-index: 2; }
+        
+        .movie-card img { width: 100%; height: 280px; object-fit: cover; border-radius: 4px; margin-bottom: 10px; }
+        .movie-card h3 { margin: 0; font-size: 18px; }
+        .movie-card p { color: #808080; font-size: 14px; margin: 5px 0; }
+
+        /* --- Button Container (Hidden by default) --- */
+        .card-buttons { display: flex; gap: 8px; margin-top: auto; opacity: 0; transition: opacity 0.3s; }
+        .movie-card:hover .card-buttons { opacity: 1; }
+
+        /* Play Button Style */
+        .btn-play { flex: 1; background-color: white; color: black; border: none; padding: 8px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .btn-play:hover { background-color: #e6e6e6; }
+
+        /* Delete Button Style */
+        .btn-delete { flex: 1; background-color: transparent; border: 1px solid #E50914; color: #E50914; padding: 8px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        .btn-delete:hover { background-color: #E50914; color: white; }
+    </style>
+</head>
+<body>
+    <div class="nav">
+        <div class="logo">NETFLIX</div>
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <input type="text" id="searchBar" placeholder="Search for a movie..." onkeyup="searchMovies()" style="padding: 10px; border-radius: 4px; border: none; width: 250px;">
+            <button onclick="alert('Login coming soon!')" style="padding: 7px 17px; background-color: #E50914; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 14px;">Sign In</button>
+        </div>
+    </div>
+
+    <div class="controls">
+        <input type="text" id="titleInput" placeholder="Movie Title">
+        <input type="text" id="genreInput" placeholder="Genre">
+        <input type="number" id="yearInput" placeholder="Year">
+        <input type="text" id="posterInput" placeholder="Poster Image URL">
+        <button onclick="addMovie()">+ Add to List</button>
+    </div>
+
+    <div class="movie-grid" id="movieGrid"></div>
+
+    <script>
+        const API_URL = 'http://localhost:8080/movies';
+
+        async function fetchMovies() {
+            const response = await fetch(API_URL);
+            const movies = await response.json();
+            const grid = document.getElementById('movieGrid');
+            grid.innerHTML = movies.map(movie => `
+                <div class="movie-card">
+                    <img src="${movie.posterUrl || 'https://placeholder.com'}" alt="Poster">
+                    <div>
+                        <h3>${movie.title}</h3>
+                        <p>${movie.genre} • ${movie.year}</p>
+                    </div>
+                    <div class="card-buttons">
+                        <button class="btn-play" onclick="playMovie('${movie.title}')">▶ Play</button>
+                        <button class="btn-delete" onclick="deleteMovie('${movie.id}')">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function playMovie(title) {
+            const query = encodeURIComponent(title + " official trailer");
+            window.open(`https://youtube.com{query}`, '_blank');
+        }
+
+        async function deleteMovie(id) {
+            if(confirm("Delete this movie?")) {
+                await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+                fetchMovies();
+            }
+        }
+
+        async function addMovie() {
+            const title = document.getElementById('titleInput').value;
+            const genre = document.getElementById('genreInput').value;
+            const year = document.getElementById('yearInput').value;
+            const posterUrl = document.getElementById('posterInput').value;
+
+            if(!title) return alert("Please enter a title");
+
+            await fetch(API_URL, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ title, genre, year, posterUrl })
+            });
+
+            document.getElementById('titleInput').value = '';
+            document.getElementById('genreInput').value = '';
+            document.getElementById('yearInput').value = '';
+            document.getElementById('posterInput').value = '';
+            fetchMovies();
+        }
+
+        function searchMovies() {
+            let filter = document.getElementById('searchBar').value.toLowerCase();
+            let cards = document.getElementsByClassName('movie-card');
+            for (let card of cards) {
+                let title = card.querySelector('h3').innerText.toLowerCase();
+                card.style.display = title.includes(filter) ? "" : "none";
+            }
+        }
+
+        fetchMovies();
+    </script>
+</body>
+</html>
+
+
