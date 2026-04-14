@@ -26,3 +26,4 @@ public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         .httpBasic(basic -> basic.disable());
     return http.build();
 }
+}
