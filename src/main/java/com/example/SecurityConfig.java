@@ -3,31 +3,22 @@ package com.example;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
-@EnableWebSecurity // <--- Tell Spring to use YOUR settings, not defaults
 public class SecurityConfig {
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                // Force allow everything including error pages
-                .requestMatchers("/", "/index.html", "/static/**", "/error/**").permitAll()
+                .requestMatchers("/", "/index.html", "/images/**", "/css/**", "/js/**", "/**").permitAll()
                 .anyRequest().permitAll()
             )
-            .formLogin(form -> form.disable()) 
+            .formLogin(form -> form.disable())
             .httpBasic(basic -> basic.disable());
+
         return http.build();
     }
 }
