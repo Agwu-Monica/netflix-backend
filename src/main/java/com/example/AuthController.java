@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/auth") // This opens the "/auth" door
 @CrossOrigin(origins = "*")
 public class AuthController {
 
@@ -20,7 +20,7 @@ public class AuthController {
         return "Success";
     }
 
-    @PostMapping("/login")
+    @PostMapping("/login") // This opens the "/login" door
     public String login(@RequestBody MovieUser user) {
         return userRepository.findByUsername(user.getUsername())
                 .filter(u -> u.getPassword().equals(user.getPassword()))
