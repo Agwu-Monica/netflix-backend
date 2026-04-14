@@ -16,11 +16,13 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-            .csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
-        return http.build();
-    }
+public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    http
+        .csrf(csrf -> csrf.disable()) // Disable protection so our buttons work
+        .authorizeHttpRequests(auth -> auth
+            .anyRequest().permitAll() // Let everyone see the page
+        )
+        .formLogin(form -> form.disable()) // This REMOVES that blue login page!
+        .httpBasic(basic -> basic.disable());
+    return http.build();
 }
-
