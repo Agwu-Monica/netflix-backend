@@ -3,11 +3,13 @@ package com.example;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
+@EnableWebSecurity // <--- Tell Spring to use YOUR settings, not defaults
 public class SecurityConfig {
 
     @Bean
@@ -16,14 +18,16 @@ public class SecurityConfig {
     }
 
     @Bean
-public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-    http
-        .csrf(csrf -> csrf.disable()) // Disable protection so our buttons work
-        .authorizeHttpRequests(auth -> auth
-            .anyRequest().permitAll() // Let everyone see the page
-        )
-        .formLogin(form -> form.disable()) // This REMOVES that blue login page!
-        .httpBasic(basic -> basic.disable());
-    return http.build();
-}
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+            .csrf(csrf -> csrf.disable())
+            .authorizeHttpRequests(auth -> auth
+                // Force allow everything including error pages
+                .requestMatchers("/", "/index.html", "/static/**", "/error/**").permitAll()
+                .anyRequest().permitAll()
+            )
+            .formLogin(form -> form.disable()) 
+            .httpBasic(basic -> basic.disable());
+        return http.build();
+    }
 }
