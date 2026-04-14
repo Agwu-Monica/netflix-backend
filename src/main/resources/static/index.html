@@ -4,55 +4,25 @@
     <title>Netflix Clone</title>
     <style>
         body { background-color: #141414; color: white; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; margin: 0; }
-        
-        /* Navigation Bar */
         .nav { padding: 20px 5%; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(to bottom, rgba(0,0,0,0.7) 10%, rgba(0,0,0,0)); }
         .logo { color: #E50914; font-size: 40px; font-weight: bold; letter-spacing: -2px; }
-        
-        /* Search and Sign In grouping */
         .nav-right { display: flex; align-items: center; gap: 20px; }
         .search-bar { padding: 10px; border-radius: 4px; border: none; width: 250px; background: #333; color: white; }
-
-        /* Add Movie Section */
         .controls { padding: 20px 5%; background: #222; display: flex; gap: 10px; flex-wrap: wrap; }
         .controls input { padding: 10px; border-radius: 4px; border: none; flex: 1; min-width: 150px; background: #333; color: white; }
-        
-        /* General Buttons */
         button { padding: 10px 20px; background-color: #E50914; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
-        button:hover { background-color: #f40612; }
-
-        /* Movie Grid */
         .movie-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; padding: 40px 5%; }
-        .movie-card { background: #181818; border-radius: 4px; overflow: hidden; transition: transform 0.3s; border: 1px solid #333; padding: 15px; display: flex; flex-direction: column; position: relative; }
+        .movie-card { background: #181818; border-radius: 4px; overflow: hidden; transition: transform 0.3s; border: 1px solid #333; padding: 15px; display: flex; flex-direction: column; cursor: pointer; }
         .movie-card:hover { transform: scale(1.05); z-index: 2; }
         .movie-card img { width: 100%; height: 280px; object-fit: cover; border-radius: 4px; margin-bottom: 10px; }
-        .movie-card h3 { margin: 0; font-size: 18px; }
-        .movie-card p { color: #808080; font-size: 14px; margin: 10px 0; }
+        .card-actions { display: flex; gap: 10px; margin-top: auto; opacity: 0; transition: opacity 0.3s; }
+        .movie-card:hover .card-actions { opacity: 1; }
+        .btn-play { flex: 1; background: white; color: black; padding: 8px; border-radius: 4px; font-weight: bold; }
+        .btn-delete { flex: 1; background: transparent; border: 1px solid #E50914; color: #E50914; padding: 8px; border-radius: 4px; }
 
-        /* Card Action Buttons (HIDDEN UNTIL HOVER) */
-        .card-actions { 
-            display: flex; 
-            gap: 10px; 
-            margin-top: auto; 
-            opacity: 0; /* Invisible by default */
-            transition: opacity 0.3s ease-in-out; 
-        }
-        
-        /* Show buttons when hovering over the card */
-        .movie-card:hover .card-actions { 
-            opacity: 1; 
-        }
-
-        .btn-play { flex: 1; background: white; color: black; padding: 8px; border-radius: 4px; font-weight: bold; border: none; cursor: pointer; }
-        .btn-play:hover { background: #e6e6e6; }
-        
-        .btn-delete { flex: 1; background: transparent; border: 1px solid #E50914; color: #E50914; padding: 8px; border-radius: 4px; font-size: 12px; cursor: pointer; }
-        .btn-delete:hover { background: #E50914; color: white; }
-
-        /* Login Modal */
-        #loginModal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:1000; justify-content:center; align-items:center; }
-        .modal-content { background:#222; padding:40px; border-radius:8px; width:300px; text-align:center; border: 1px solid #333; }
-        .modal-content input { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 4px; border: none; box-sizing: border-box; background: #333; color: white; }
+        /* Story Details Modal */
+        #detailsModal, #loginModal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:1000; justify-content:center; align-items:center; }
+        .modal-content { background:#222; padding:40px; border-radius:8px; width:400px; text-align:center; border: 1px solid #333; }
     </style>
 </head>
 <body>
@@ -69,88 +39,87 @@
         <input type="text" id="titleInput" placeholder="Movie Title">
         <input type="text" id="genreInput" placeholder="Genre">
         <input type="number" id="yearInput" placeholder="Year">
-        <input type="text" id="posterInput" placeholder="Poster Image URL">
+        <input type="text" id="posterInput" placeholder="Poster URL">
+        <input type="text" id="descInput" placeholder="Movie Story/Description"> <!-- NEW INPUT -->
         <button onclick="addMovie()">+ Add to List</button>
     </div>
 
     <div class="movie-grid" id="movieGrid"></div>
 
-    <!-- Login Modal HTML -->
+    <!-- Login Modal -->
     <div id="loginModal">
         <div class="modal-content">
-            <h2 id="modalTitle" style="margin-bottom:20px;">Sign In</h2>
-            <input type="text" id="userIn" placeholder="Username">
-            <input type="password" id="passIn" placeholder="Password">
-            <button onclick="handleAuth()" id="authBtn" style="width:100%;">Login</button>
-            <p onclick="toggleAuth()" style="color:#aaa; cursor:pointer; font-size:12px; margin-top:20px;" id="toggleText">New to Netflix? Sign up now.</p>
-            <button onclick="document.getElementById('loginModal').style.display='none'" style="background:none; border:none; color:#555; cursor:pointer; margin-top:10px;">Close</button>
+            <h2 id="modalTitle">Sign In</h2>
+            <input type="text" id="userIn" placeholder="Username" style="width:100%; margin-bottom:10px;"><br>
+            <input type="password" id="passIn" placeholder="Password" style="width:100%; margin-bottom:20px;"><br>
+            <button onclick="handleAuth()" style="width:100%;">Submit</button>
+            <button onclick="document.getElementById('loginModal').style.display='none'" style="background:none; margin-top:10px;">Close</button>
+        </div>
+    </div>
+
+    <!-- Story Details Modal -->
+    <div id="detailsModal">
+        <div class="modal-content">
+            <img id="detailImg" src="" style="width:100%; border-radius:8px; margin-bottom:15px;">
+            <h2 id="detailTitle"></h2>
+            <p id="detailDesc" style="color:#ccc; line-height:1.6;"></p>
+            <button onclick="document.getElementById('detailsModal').style.display='none'">Close</button>
         </div>
     </div>
 
     <script>
         const API_URL = window.location.origin + '/movies';
-        const AUTH_URL = window.location.origin + '/auth';
 
-        // 1. Fetch and Display Movies
         async function fetchMovies() {
-            try {
-                const res = await fetch(API_URL);
-                const movies = await res.json();
-                const grid = document.getElementById('movieGrid');
-                grid.innerHTML = movies.map(movie => `
-                    <div class="movie-card">
-                        <img src="${movie.posterUrl || 'https://placeholder.com'}" alt="Poster">
-                        <div>
-                            <h3>${movie.title}</h3>
-                            <p>${movie.genre} • ${movie.year}</p>
-                        </div>
-                        <div class="card-actions">
-                            <button class="btn-play" onclick="playMovie('${movie.title}')">▶ Play</button>
-                            <button class="btn-delete" onclick="deleteMovie('${movie.id}')">Delete</button>
-                        </div>
+            const res = await fetch(API_URL);
+            const movies = await res.json();
+            document.getElementById('movieGrid').innerHTML = movies.map(movie => `
+                <div class="movie-card">
+                    <img src="${movie.posterUrl}" onclick="showDetails('${movie.title}', '${movie.description}', '${movie.posterUrl}')">
+                    <h3 onclick="showDetails('${movie.title}', '${movie.description}', '${movie.posterUrl}')">${movie.title}</h3>
+                    <p>${movie.genre} • ${movie.year}</p>
+                    <div class="card-actions">
+                        <button class="btn-play" onclick="playMovie('${movie.title}')">▶ Play</button>
+                        <button class="btn-delete" onclick="deleteMovie('${movie.id}')">Delete</button>
                     </div>
-                `).join('');
-            } catch (err) {
-                console.error("Error fetching movies:", err);
-            }
+                </div>
+            `).join('');
         }
 
-        // 2. Add Movie
+        function showDetails(title, desc, img) {
+            document.getElementById('detailTitle').innerText = title;
+            document.getElementById('detailDesc').innerText = desc || "No description added for this movie.";
+            document.getElementById('detailImg').src = img;
+            document.getElementById('detailsModal').style.display = 'flex';
+        }
+
         async function addMovie() {
             const title = document.getElementById('titleInput').value;
             const genre = document.getElementById('genreInput').value;
             const year = document.getElementById('yearInput').value;
             const posterUrl = document.getElementById('posterInput').value;
-            if(!title) return alert("Please enter a title");
+            const description = document.getElementById('descInput').value; // NEW
 
             await fetch(API_URL, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ title, genre, year, posterUrl })
+                body: JSON.stringify({ title, genre, year, posterUrl, description })
             });
 
-            document.getElementById('titleInput').value = '';
-            document.getElementById('genreInput').value = '';
-            document.getElementById('yearInput').value = '';
-            document.getElementById('posterInput').value = '';
             fetchMovies();
         }
 
-        // 3. Delete Movie
         async function deleteMovie(id) {
-            if(confirm("Delete this movie?")) {
+            if(confirm("Delete this?")) {
                 await fetch(API_URL + '/' + id, { method: 'DELETE' });
                 fetchMovies();
             }
         }
 
-        // 4. Play Movie (YouTube Search)
         function playMovie(title) {
-            const query = encodeURIComponent(title + " official trailer");
-            window.open('https://youtube.com' + query, '_blank');
+            window.open('https://youtube.com' + title + ' trailer', '_blank');
         }
 
-        // 5. Search Filtering
         function searchMovies() {
             let filter = document.getElementById('searchBar').value.toLowerCase();
             let cards = document.getElementsByClassName('movie-card');
@@ -160,39 +129,6 @@
             }
         }
 
-        // 6. Login/Signup Logic
-        let isLogin = true;
-        function toggleAuth() {
-            isLogin = !isLogin;
-            document.getElementById('modalTitle').innerText = isLogin ? "Sign In" : "Sign Up";
-            document.getElementById('authBtn').innerText = isLogin ? "Login" : "Sign Up";
-            document.getElementById('toggleText').innerText = isLogin ? "New to Netflix? Sign up now." : "Already a user? Login now.";
-        }
-
-        async function handleAuth() {
-            const username = document.getElementById('userIn').value;
-            const password = document.getElementById('passIn').value;
-            const endpoint = isLogin ? '/login' : '/signup';
-            
-            try {
-                const res = await fetch(AUTH_URL + endpoint, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ username, password })
-                });
-                const result = await res.text();
-                if(result === "Success") {
-                    alert("Welcome, " + username + "!");
-                    document.getElementById('loginModal').style.display = 'none';
-                } else {
-                    alert(result);
-                }
-            } catch (err) {
-                alert("Auth system not responding.");
-            }
-        }
-
-        // Initial Load
         fetchMovies();
     </script>
 </body>
