@@ -118,7 +118,8 @@
             const searchQuery = encodeURIComponent(title + " official trailer");
             
             // THE CRITICAL FIX: Added https://youtube.com...
-            document.getElementById('trailerVideo').src = "https://youtube.com?listType=search&list=" + searchQuery;
+            document.getElementById('trailerVideo').src = "https://www.youtube.com/embed?listType=search&list=" + searchQuery;
+
             
             document.getElementById('detailsModal').style.display = 'flex';
         }
