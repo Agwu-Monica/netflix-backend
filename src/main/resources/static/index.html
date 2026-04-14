@@ -15,7 +15,7 @@
 
         /* Add Movie Section */
         .controls { padding: 20px 5%; background: #222; display: flex; gap: 10px; flex-wrap: wrap; }
-        .controls input { padding: 10px; border-radius: 4px; border: none; flex: 1; min-width: 150px; }
+        .controls input { padding: 10px; border-radius: 4px; border: none; flex: 1; min-width: 150px; background: #333; color: white; }
         
         /* General Buttons */
         button { padding: 10px 20px; background-color: #E50914; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
@@ -23,15 +23,29 @@
 
         /* Movie Grid */
         .movie-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; padding: 40px 5%; }
-        .movie-card { background: #181818; border-radius: 4px; overflow: hidden; transition: transform 0.3s; border: 1px solid #333; padding: 15px; display: flex; flex-direction: column; }
+        .movie-card { background: #181818; border-radius: 4px; overflow: hidden; transition: transform 0.3s; border: 1px solid #333; padding: 15px; display: flex; flex-direction: column; position: relative; }
         .movie-card:hover { transform: scale(1.05); z-index: 2; }
         .movie-card img { width: 100%; height: 280px; object-fit: cover; border-radius: 4px; margin-bottom: 10px; }
         .movie-card h3 { margin: 0; font-size: 18px; }
         .movie-card p { color: #808080; font-size: 14px; margin: 10px 0; }
 
-        /* Card Action Buttons (Always Visible) */
-        .card-actions { display: flex; gap: 10px; margin-top: auto; }
+        /* Card Action Buttons (HIDDEN UNTIL HOVER) */
+        .card-actions { 
+            display: flex; 
+            gap: 10px; 
+            margin-top: auto; 
+            opacity: 0; /* Invisible by default */
+            transition: opacity 0.3s ease-in-out; 
+        }
+        
+        /* Show buttons when hovering over the card */
+        .movie-card:hover .card-actions { 
+            opacity: 1; 
+        }
+
         .btn-play { flex: 1; background: white; color: black; padding: 8px; border-radius: 4px; font-weight: bold; border: none; cursor: pointer; }
+        .btn-play:hover { background: #e6e6e6; }
+        
         .btn-delete { flex: 1; background: transparent; border: 1px solid #E50914; color: #E50914; padding: 8px; border-radius: 4px; font-size: 12px; cursor: pointer; }
         .btn-delete:hover { background: #E50914; color: white; }
 
@@ -115,7 +129,6 @@
                 body: JSON.stringify({ title, genre, year, posterUrl })
             });
 
-            // Clear inputs
             document.getElementById('titleInput').value = '';
             document.getElementById('genreInput').value = '';
             document.getElementById('yearInput').value = '';
@@ -184,4 +197,5 @@
     </script>
 </body>
 </html>
+
 
