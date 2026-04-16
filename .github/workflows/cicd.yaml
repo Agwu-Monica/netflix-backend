@@ -40,6 +40,7 @@ jobs:
           context: .
           push: true
           # Note: Everything is lowercase to prevent errors
-          tags: |
+                    tags: |
             ghcr.io/agwu-monica/netflix-backend:latest
             ${{ secrets.AZURE_REGISTRY_SERVER }}/netflix-backend:latest
+
