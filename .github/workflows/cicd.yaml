@@ -18,25 +18,28 @@ jobs:
       - name: 2. Check System Info
         run: hostnamectl
 
-      - name: 3. Login to GitHub & Azure
+      # --- LOGINS ---
+      - name: 3. Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 4. Login to Azure Registry
+      - name: 4. Login to Azure Container Registry
         uses: azure/docker-login@v1
         with:
           login-server: ${{ secrets.AZURE_REGISTRY_SERVER }}
           username: ${{ secrets.AZURE_REGISTRY_USERNAME }}
           password: ${{ secrets.AZURE_REGISTRY_PASSWORD }}
 
-      - name: 5. Professional Build and Multi-Push
+      # --- BUILD AND MULTI-PUSH ---
+      - name: 5. Build and Push to All
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
+          # Note: Everything is lowercase to prevent errors
           tags: |
             ghcr.io/agwu-monica/netflix-backend:latest
             ${{ secrets.AZURE_REGISTRY_SERVER }}/netflix-backend:latest
