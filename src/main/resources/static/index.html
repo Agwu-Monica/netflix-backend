@@ -50,7 +50,6 @@
     <div class="nav">
         <div class="logo">NETFLIX</div>
         <div class="nav-right">
-            <!-- RESTORED SEARCH BAR -->
             <input type="text" id="searchBar" class="search-bar" placeholder="Titles, genres..." onkeyup="searchMovies()">
             <button onclick="document.getElementById('loginModal').style.display='flex'">Sign In</button>
         </div>
@@ -120,23 +119,27 @@
             } catch (err) { console.error("Fetch Error:", err); }
         }
 
+        // --- THE FIXED YOUTUBE LOGIC ---
         function openDetails(title, desc, trailerUrl) {
             document.getElementById('modalTitleText').innerText = title;
             document.getElementById('modalDesc').innerText = desc;
             
-            // Logic to convert standard YouTube links to Embed format
             let videoId = "";
-            if (trailerUrl.includes("v=")) {
-                videoId = trailerUrl.split("v=")[1].split("&")[0];
-            } else if (trailerUrl.includes("youtu.be/")) {
-                videoId = trailerUrl.split("youtu.be/")[1].split("?")[0];
+            if (trailerUrl) {
+                if (trailerUrl.includes("v=")) {
+                    // Extract from: https://youtube.com
+                    videoId = trailerUrl.split("v=")[1].split("&")[0];
+                } else if (trailerUrl.includes("youtu.be/")) {
+                    // Extract from: https://youtu.be
+                    videoId = trailerUrl.split("youtu.be/")[1].split("?")[0];
+                }
             }
 
             if (videoId) {
-                document.getElementById('trailerVideo').src = `https://youtube.com{videoId}?autoplay=1`;
+                document.getElementById('trailerVideo').src = "https://youtube.com" + videoId + "?autoplay=1";
                 document.getElementById('detailsModal').style.display = 'flex';
             } else {
-                alert("This movie does not have a valid trailer link in the database.");
+                alert("Please add a valid YouTube link in the top bar or MongoDB Compass!");
             }
         }
 
