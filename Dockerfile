@@ -1,5 +1,9 @@
 # Stage 1: Build the app
 FROM maven:3.8.5-openjdk-17 AS build
+
+# --- NEW: This updates the system inside the container ---
+RUN apt-get update && apt-get install -y
+
 COPY . .
 RUN mvn clean package -DskipTests
 
