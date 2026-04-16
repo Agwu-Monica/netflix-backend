@@ -4,73 +4,127 @@
     <title>Monica's Netflix</title>
     <style>
         body { background-color: #141414; color: white; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; margin: 0; }
-        .nav { padding: 20px 5%; display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.8); }
-        .logo { color: #E50914; font-size: 30px; font-weight: bold; }
-        .controls { padding: 20px 5%; background: #222; display: flex; gap: 10px; flex-wrap: wrap; }
-        .controls input { padding: 10px; border-radius: 4px; border: none; flex: 1; min-width: 150px; background: #333; color: white; }
-        button { padding: 10px 20px; background-color: #E50914; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
-        .movie-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; padding: 40px 5%; }
-        .movie-card { background: #181818; border-radius: 8px; overflow: hidden; transition: 0.3s; border: 1px solid #333; padding: 15px; text-align: center; }
-        .movie-card:hover { transform: scale(1.05); }
-        .movie-card img { width: 100%; height: 280px; object-fit: cover; border-radius: 4px; cursor: pointer; }
         
-        /* Modal for Video Player */
-        #detailsModal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:1000; justify-content:center; align-items:center; }
-        .modal-content { background:#222; padding:30px; border-radius:8px; width:90%; max-width:700px; border: 1px solid #444; }
-        #videoContainer { position: relative; width: 100%; padding-top: 56.25%; background: #000; margin-bottom: 20px; }
+        /* Navigation Bar */
+        .nav { padding: 20px 5%; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(to bottom, rgba(0,0,0,0.8) 10%, rgba(0,0,0,0)); position: sticky; top: 0; z-index: 100; }
+        .logo { color: #E50914; font-size: 35px; font-weight: bold; letter-spacing: -2px; }
+        
+        .nav-right { display: flex; align-items: center; gap: 20px; }
+        .search-bar { padding: 10px; border-radius: 4px; border: none; width: 250px; background: #333; color: white; border: 1px solid transparent; transition: 0.3s; }
+        .search-bar:focus { border-color: #E50914; outline: none; width: 300px; }
+
+        /* Add Movie Section */
+        .controls { padding: 20px 5%; background: #222; display: flex; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid #333; }
+        .controls input { padding: 10px; border-radius: 4px; border: none; flex: 1; background: #333; color: white; min-width: 150px; }
+        
+        button { padding: 10px 20px; background-color: #E50914; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        button:hover { background-color: #f40612; transform: scale(1.05); }
+
+        /* Movie Grid */
+        .movie-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 30px; padding: 40px 5%; }
+        .movie-card { background: #181818; border-radius: 8px; overflow: hidden; transition: transform 0.3s; border: 1px solid #333; padding: 15px; display: flex; flex-direction: column; position: relative; }
+        .movie-card:hover { transform: scale(1.08); z-index: 10; border-color: #555; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        .movie-card img { width: 100%; height: 280px; object-fit: cover; border-radius: 4px; margin-bottom: 10px; cursor: pointer; }
+        .movie-card h3 { margin: 0; font-size: 18px; margin-bottom: 5px; }
+        .movie-card p { color: #808080; font-size: 14px; margin: 0; margin-bottom: 15px; }
+
+        /* Action Buttons (Show on Hover) */
+        .card-actions { display: flex; gap: 10px; margin-top: auto; opacity: 0; transition: opacity 0.3s; }
+        .movie-card:hover .card-actions { opacity: 1; }
+
+        .btn-play { flex: 2; background: white; color: black; padding: 8px; border-radius: 4px; font-weight: bold; font-size: 13px; }
+        .btn-delete { flex: 1; background: transparent; border: 1px solid #E50914; color: #E50914; padding: 8px; border-radius: 4px; font-size: 11px; }
+
+        /* Modals */
+        #detailsModal, #loginModal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:1000; justify-content:center; align-items:center; }
+        .modal-content { background:#222; padding:35px; border-radius:12px; width:90%; max-width:700px; text-align:center; border: 1px solid #444; position: relative; }
+        
+        #videoContainer { position: relative; width: 100%; padding-top: 56.25%; margin-bottom: 25px; border-radius: 8px; overflow: hidden; background: #000; box-shadow: 0 0 30px rgba(229, 9, 20, 0.2); }
         #trailerVideo { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+
+        .close-btn { background: #444; width: 100%; margin-top: 10px; }
     </style>
 </head>
 <body>
 
     <div class="nav">
         <div class="logo">NETFLIX</div>
-        <button onclick="document.getElementById('loginModal').style.display='flex'">Sign In</button>
+        <div class="nav-right">
+            <!-- RESTORED SEARCH BAR -->
+            <input type="text" id="searchBar" class="search-bar" placeholder="Titles, genres..." onkeyup="searchMovies()">
+            <button onclick="document.getElementById('loginModal').style.display='flex'">Sign In</button>
+        </div>
     </div>
 
     <div class="controls">
-        <input type="text" id="titleIn" placeholder="Title">
-        <input type="text" id="genreIn" placeholder="Genre">
-        <input type="number" id="yearIn" placeholder="Year">
-        <input type="text" id="posterIn" placeholder="Poster URL">
-        <input type="text" id="trailerIn" placeholder="YouTube Link (e.g. https://youtube.com...)">
-        <input type="text" id="descIn" placeholder="Story Description">
+        <input type="text" id="titleInput" placeholder="Movie Title">
+        <input type="text" id="genreInput" placeholder="Genre">
+        <input type="number" id="yearInput" placeholder="Year">
+        <input type="text" id="posterInput" placeholder="Poster URL">
+        <input type="text" id="trailerInput" placeholder="YouTube Trailer Link">
+        <input type="text" id="descInput" placeholder="Story Description">
         <button onclick="addMovie()">+ Add Movie</button>
     </div>
 
     <div class="movie-grid" id="movieGrid"></div>
 
+    <!-- Login Modal -->
+    <div id="loginModal">
+        <div class="modal-content" style="max-width: 350px;">
+            <h2 id="modalTitle" style="margin-bottom:20px;">Sign In</h2>
+            <input type="text" id="userIn" placeholder="Username" style="width:100%; padding:10px; margin-bottom:15px; border-radius:4px; border:none; background:#333; color:white;">
+            <input type="password" id="passIn" placeholder="Password" style="width:100%; padding:10px; margin-bottom:25px; border-radius:4px; border:none; background:#333; color:white;">
+            <button onclick="handleAuth()" id="authBtn" style="width:100%;">Login</button>
+            <p onclick="toggleAuth()" style="color:#aaa; cursor:pointer; font-size:12px; margin-top:20px;" id="toggleText">New to Netflix? Sign up now.</p>
+            <button onclick="document.getElementById('loginModal').style.display='none'" class="close-btn">Close</button>
+        </div>
+    </div>
+
+    <!-- Trailer Details Modal -->
     <div id="detailsModal">
         <div class="modal-content">
-            <h2 id="modalTitle" style="color:#E50914;"></h2>
+            <h2 id="modalTitleText" style="color:#E50914; margin-bottom: 20px; font-size: 28px;"></h2>
             <div id="videoContainer">
                 <iframe id="trailerVideo" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
             </div>
-            <p id="modalDesc" style="color:#ccc; line-height:1.5;"></p>
-            <button onclick="closeDetails()" style="background:#444; width:100%;">Close Player</button>
+            <p id="modalDesc" style="line-height:1.6; color:#ccc; margin-bottom: 25px; font-size: 15px;"></p>
+            <button onclick="closeDetails()" class="close-btn">Close Preview</button>
         </div>
     </div>
 
     <script>
         const API_URL = window.location.origin + '/movies';
+        const AUTH_URL = window.location.origin + '/auth';
 
         async function fetchMovies() {
-            const res = await fetch(API_URL);
-            const movies = await res.json();
-            document.getElementById('movieGrid').innerHTML = movies.map(movie => `
-                <div class="movie-card">
-                    <img src="${movie.posterUrl}" onclick="openDetails('${movie.title.replace(/'/g, "\\'")}', '${(movie.description || "").replace(/'/g, "\\'")}', '${movie.trailerUrl}')">
-                    <h3>${movie.title}</h3>
-                    <button onclick="openDetails('${movie.title.replace(/'/g, "\\'")}', '${(movie.description || "").replace(/'/g, "\\'")}', '${movie.trailerUrl}')" style="width:100%; background:white; color:black; margin-top:10px;">Watch Trailer</button>
-                </div>
-            `).join('');
+            try {
+                const res = await fetch(API_URL);
+                const movies = await res.json();
+                document.getElementById('movieGrid').innerHTML = movies.map(movie => {
+                    const safeTitle = (movie.title || "").replace(/'/g, "\\'");
+                    const safeDesc = (movie.description || "No story added yet.").replace(/'/g, "\\'");
+                    const trailerUrl = movie.trailerUrl || "";
+                    
+                    return `
+                        <div class="movie-card">
+                            <img src="${movie.posterUrl || 'https://placeholder.com'}" onclick="openDetails('${safeTitle}', '${safeDesc}', '${trailerUrl}')">
+                            <h3 style="margin-top:10px;">${movie.title}</h3>
+                            <p>${movie.genre} • ${movie.year}</p>
+                            <div class="card-actions">
+                                <button class="btn-play" onclick="openDetails('${safeTitle}', '${safeDesc}', '${trailerUrl}')">Watch Trailer</button>
+                                <button class="btn-delete" onclick="deleteMovie('${movie.id}')">Delete</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (err) { console.error("Fetch Error:", err); }
         }
 
         function openDetails(title, desc, trailerUrl) {
-            document.getElementById('modalTitle').innerText = title;
-            document.getElementById('modalDesc').innerText = desc || "No description provided.";
+            document.getElementById('modalTitleText').innerText = title;
+            document.getElementById('modalDesc').innerText = desc;
             
-            // Convert normal YouTube link to Embed link
+            // Logic to convert standard YouTube links to Embed format
             let videoId = "";
             if (trailerUrl.includes("v=")) {
                 videoId = trailerUrl.split("v=")[1].split("&")[0];
@@ -79,10 +133,10 @@
             }
 
             if (videoId) {
-                document.getElementById('trailerVideo').src = "https://youtube.com" + videoId + "?autoplay=1";
+                document.getElementById('trailerVideo').src = `https://youtube.com{videoId}?autoplay=1`;
                 document.getElementById('detailsModal').style.display = 'flex';
             } else {
-                alert("No valid YouTube link found for this movie!");
+                alert("This movie does not have a valid trailer link in the database.");
             }
         }
 
@@ -93,12 +147,12 @@
 
         async function addMovie() {
             const movieData = {
-                title: document.getElementById('titleIn').value,
-                genre: document.getElementById('genreIn').value,
-                year: document.getElementById('yearIn').value,
-                posterUrl: document.getElementById('posterIn').value,
-                trailerUrl: document.getElementById('trailerIn').value,
-                description: document.getElementById('descIn').value
+                title: document.getElementById('titleInput').value,
+                genre: document.getElementById('genreInput').value,
+                year: document.getElementById('yearInput').value,
+                posterUrl: document.getElementById('posterInput').value,
+                trailerUrl: document.getElementById('trailerInput').value,
+                description: document.getElementById('descInput').value
             };
 
             await fetch(API_URL, {
@@ -107,6 +161,46 @@
                 body: JSON.stringify(movieData)
             });
             fetchMovies();
+        }
+
+        async function deleteMovie(id) {
+            if(confirm("Delete this movie?")) {
+                await fetch(API_URL + '/' + id, { method: 'DELETE' });
+                fetchMovies();
+            }
+        }
+
+        function searchMovies() {
+            let filter = document.getElementById('searchBar').value.toLowerCase();
+            let cards = document.getElementsByClassName('movie-card');
+            for (let card of cards) {
+                let title = card.querySelector('h3').innerText.toLowerCase();
+                card.style.display = title.includes(filter) ? "" : "none";
+            }
+        }
+
+        let isLogin = true;
+        function toggleAuth() {
+            isLogin = !isLogin;
+            document.getElementById('modalTitle').innerText = isLogin ? "Sign In" : "Sign Up";
+            document.getElementById('authBtn').innerText = isLogin ? "Login" : "Sign Up";
+            document.getElementById('toggleText').innerText = isLogin ? "New to Netflix? Sign up now." : "Already a user? Login now.";
+        }
+
+        async function handleAuth() {
+            const username = document.getElementById('userIn').value;
+            const password = document.getElementById('passIn').value;
+            const endpoint = isLogin ? '/login' : '/signup';
+            const res = await fetch(AUTH_URL + endpoint, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ username, password })
+            });
+            const result = await res.text();
+            if(result === "Success") {
+                alert("Welcome, " + username + "!");
+                document.getElementById('loginModal').style.display = 'none';
+            } else { alert(result); }
         }
 
         fetchMovies();
