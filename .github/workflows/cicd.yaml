@@ -16,9 +16,9 @@ jobs:
       - name: Login to Azure Container Registry
         uses: azure/docker-login@v1
         with:
-          login-server: monicanetflixregistry.azurecr.io
-          username: ${{ secrets.ACR_USERNAME }}
-          password: ${{ secrets.ACR_PASSWORD }}
+          login-server: ${{ secrets.AZURE_REGISTRY_SERVER }}
+          username: ${{ secrets.AZURE_REGISTRY_USERNAME }}
+          password: ${{ secrets.AZURE_REGISTRY_PASSWORD }}
 
       - name: Build and push Docker image
         run: |
