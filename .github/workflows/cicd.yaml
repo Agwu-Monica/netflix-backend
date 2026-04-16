@@ -1,4 +1,4 @@
-name: Manual Build (Learning Mode)
+name: Docker-build-and-push (Manual)
 
 on:
   push:
@@ -12,7 +12,7 @@ jobs:
       packages: write
 
     steps:
-      - name: 1. Grab my code from GitHub
+      - name: 1. Grab code
         uses: actions/checkout@v4
 
       - name: 2. Check System Info (Hostnamectl)
@@ -22,7 +22,7 @@ jobs:
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: 4. Build the Image (Manual)
-        run: docker build -t ghcr.io/${{ github.repository_owner }}/netflix-manual:latest .
+        run: docker build -t ghcr.io/agwu-monica/netflix-backend:latest .
 
-      - name: 5. Push the Image to GitHub (Manual)
-        run: docker push ghcr.io/${{ github.repository_owner }}/netflix-manual:latest
+      - name: 5. Push the Image (Manual)
+        run: docker push ghcr.io/agwu-monica/netflix-backend:latest
