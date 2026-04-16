@@ -33,14 +33,13 @@ jobs:
           username: ${{ secrets.AZURE_REGISTRY_USERNAME }}
           password: ${{ secrets.AZURE_REGISTRY_PASSWORD }}
 
-      # --- BUILD AND MULTI-PUSH ---
+            # --- BUILD AND MULTI-PUSH ---
       - name: 5. Build and Push to All
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
-          # Note: Everything is lowercase to prevent errors
-                    tags: |
+          # Note: The tags below must have EXACTLY 12 spaces before them
+          tags: |
             ghcr.io/agwu-monica/netflix-backend:latest
             ${{ secrets.AZURE_REGISTRY_SERVER }}/netflix-backend:latest
-
