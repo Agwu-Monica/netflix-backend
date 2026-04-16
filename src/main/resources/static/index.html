@@ -22,9 +22,9 @@
 
         /* Movie Grid */
         .movie-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 30px; padding: 40px 5%; }
-        .movie-card { background: #181818; border-radius: 8px; overflow: hidden; transition: transform 0.3s; border: 1px solid #333; padding: 15px; display: flex; flex-direction: column; position: relative; }
+        .movie-card { background: #181818; border-radius: 8px; overflow: hidden; transition: transform 0.3s; border: 1px solid #333; padding: 15px; display: flex; flex-direction: column; position: relative; cursor: pointer; }
         .movie-card:hover { transform: scale(1.08); z-index: 10; border-color: #555; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
-        .movie-card img { width: 100%; height: 280px; object-fit: cover; border-radius: 4px; margin-bottom: 10px; cursor: pointer; }
+        .movie-card img { width: 100%; height: 280px; object-fit: cover; border-radius: 4px; margin-bottom: 10px; }
         .movie-card h3 { margin: 0; font-size: 18px; margin-bottom: 5px; }
         .movie-card p { color: #808080; font-size: 14px; margin: 0; margin-bottom: 15px; }
 
@@ -106,7 +106,8 @@
                     
                     return `
                         <div class="movie-card">
-                            <img src="${movie.posterUrl || 'https://placeholder.com'}" onclick="openDetails('${safeTitle}', '${safeDesc}', '${trailerUrl}')">
+                            <img src="${movie.posterUrl || 'https://placeholder.com'}" 
+                                 onclick="openDetails('${safeTitle}', '${safeDesc}', '${trailerUrl}')">
                             <h3 style="margin-top:10px;">${movie.title}</h3>
                             <p>${movie.genre} • ${movie.year}</p>
                             <div class="card-actions">
@@ -119,27 +120,26 @@
             } catch (err) { console.error("Fetch Error:", err); }
         }
 
-        // --- THE FIXED YOUTUBE LOGIC ---
+        // --- THE BULLETPROOF YOUTUBE LOGIC ---
         function openDetails(title, desc, trailerUrl) {
             document.getElementById('modalTitleText').innerText = title;
             document.getElementById('modalDesc').innerText = desc;
             
             let videoId = "";
-            if (trailerUrl) {
-                if (trailerUrl.includes("v=")) {
-                    // Extract from: https://youtube.com
-                    videoId = trailerUrl.split("v=")[1].split("&")[0];
-                } else if (trailerUrl.includes("youtu.be/")) {
-                    // Extract from: https://youtu.be
-                    videoId = trailerUrl.split("youtu.be/")[1].split("?")[0];
+            if (trailerUrl && trailerUrl.trim() !== "") {
+                // Professional regex to find the 11-character YouTube ID from any link
+                const match = trailerUrl.match(/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+                if (match && match[1]) {
+                    videoId = match[1];
                 }
             }
 
             if (videoId) {
-                document.getElementById('trailerVideo').src = "https://youtube.com" + videoId + "?autoplay=1";
+                // Correctly formats the URL so the server can find it
+                document.getElementById('trailerVideo').src = "https://youtube.com" + videoId + "?autoplay=1&rel=0";
                 document.getElementById('detailsModal').style.display = 'flex';
             } else {
-                alert("Please add a valid YouTube link in the top bar or MongoDB Compass!");
+                alert("The link for '" + title + "' is missing or incorrect in the database. Please use a full YouTube link!");
             }
         }
 
@@ -210,4 +210,3 @@
     </script>
 </body>
 </html>
-
