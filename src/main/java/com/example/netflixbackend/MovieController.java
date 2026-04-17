@@ -6,7 +6,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/movies")
-@CrossOrigin(origins = "*")
+// Allowing your specific frontend URL to access the data
+@CrossOrigin(origins = "https://monica-netflix-frontend.onrender.com")
 public class MovieController {
 
     @Autowired
@@ -22,7 +23,6 @@ public class MovieController {
         return repository.save(movie);
     }
 
-    // --- ADDED THIS DELETE METHOD ---
     @DeleteMapping("/{id}")
     public void deleteMovie(@PathVariable String id) {
         repository.deleteById(id);
